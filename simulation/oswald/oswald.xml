@@ -1,0 +1,14 @@
+<mujoco model="oswald">
+    <compiler inertiafromgeom="true" angle="degree" coordinates="global" />
+
+    <worldbody>
+<!--        <body name="body" pos="-0.0219 0 1.32625">-->
+        <body name="body" pos="0 0 0">
+            <geom name='body' type='box' pos='0.0531 0.1 1.41625'  size='0.075 0.1 0.09' />
+            <body name="right_recip" pos="0 0 0 ">
+                <geom name="right_recip" type="capsule" fromto="0.0381 -0.0125 1.40005 0.059101 -0.0125 1.36826" size="0.0175" />
+                <joint name="left_recip_y" type="hinge" pos="0.0381 -0.0125 1.40005" axis="0 1 0" range="-180 180"/>
+            </body>
+        </body>
+    </worldbody>
+</mujoco>
