@@ -47,6 +47,7 @@ fusion_ankle_toe_xz = np.array([0.155949, 0, 0.030943], np.double)
 
 fusion_foot_left_offset = np.array([0.0381, 0.0127, 0.0381], np.double)
 fusion_foot_right_offset = np.array([0.0381, -0.0127, 0.0381], np.double)
+fusion_thigh_recip_offset = fusion_thigh_joint_xz - fusion_recip_joint_xz
 
 # Setting up the origin as seen in fusion, used to find global positions of other things later
 fusion_body_corner[1] -= body_size[1]

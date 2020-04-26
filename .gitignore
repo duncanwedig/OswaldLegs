@@ -1,6 +1,5 @@
 .idea/*
-__pycache__/*
-simulation/__pycache__/*
 .vscode/*
 .floo
 .flooignore
+*.pyc
