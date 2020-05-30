@@ -19,9 +19,15 @@ class Legs:
     def __init__(self):
         self.left_offset = 0
         self.right_offset = 0
+        self.left_chain_offset = 0
+        self.right_chain_offset = 0
         self.odrv0 = odrive.find_any()
         self.odrv0.axis0.requested_state = AXIS_STATE_FULL_CALIBRATION_SEQUENCE
         self.odrv0.axis1.requested_state = AXIS_STATE_FULL_CALIBRATION_SEQUENCE
+        self.odrv1 = odrive.find_any()
+        self.odrv1.axis0.requested_state = AXIS_STATE_FULL_CALIBRATION_SEQUENCE
+        self.odrv1.axis1.requested_state = AXIS_STATE_FULL_CALIBRATION_SEQUENCE
+        self.hold_chain_bar()
 
     def reset(self):
         self.left_offset = self.odrv0.axis0.encoder.count_in_cpr
@@ -71,6 +77,13 @@ class Legs:
         for i in range(1000):
             self.odrv0.axis1.controller.current_setpoint = self.odrv0.axis1.encoder.pos / 100.
 
+    def hold_chain_bar(self):
+        self.odrv1.axis0.controller.config.control_mode = CTRL_MODE_POSITION_CONTROL
+        self.odrv1.axis1.controller.config.control_mode = CTRL_MODE_POSITION_CONTROL
+        self.left_chain_offset = self.odrv1.axis0.encoder.count_in_cpr
+        self.right_chain_offset = self.odrv1.axis1.encoder.count_in_cpr
+
+
 
 help_string = '''
     COMMANDS
@@ -116,6 +129,6 @@ if __name__ == "__main__":
             print("left offset:", legs.left_offset)
             print("right_offset:", legs.right_offset)
         elif response == "spring":
-            pass
+            print('NOT YET IMPLEMENTED')
         elif response == "help":
             print(help_string)

@@ -56,8 +56,8 @@ def make_mesh(filename, pos, fixed=False, collide=True, euler_angles=(0, 0, 0), 
     return body
 
 
-def make_joint(body1, body2, joint_pos):
-    joint = chrono.ChLinkRevolute()
+def make_joint(body1, body2, joint_pos, joint_type=chrono.ChLinkRevolute):
+    joint = joint_type()
     joint_frame = chrono.ChFrameD(chrono.ChVectorD(*swap_yz(joint_pos)))
     joint.Initialize(body1, body2, joint_frame)
     return joint
@@ -74,6 +74,7 @@ def make_model(system):
     main_body = make_box(geometry.body_size, geometry.body_center, fixed=False)
     system.Add(main_body)
 
+    # Make right links
     right_recip = make_box(geometry.recip_link_size, geometry.right_recip_link_center, fixed=False,
                           euler_angles=geometry.recip_link_euler)
     system.Add(right_recip)
@@ -102,8 +103,8 @@ def make_model(system):
                            euler_angles=geometry.ankle_link_euler2)
     system.Add(right_ankle2)
 
-    right_foot = make_mesh('foot.stl', [0, 0, 0], fixed=True, collide=False)
-    system.Add(right_foot)
+    # right_foot = make_mesh('foot.stl', [0, 0, 0], fixed=True, collide=False)
+    # system.Add(right_foot)
 
     # Setting up right joints
 
@@ -115,9 +116,6 @@ def make_model(system):
 
     right_thigh_connector_joint = make_joint(right_connector, right_thigh, geometry.right_connector_link_pos2)
     system.Add(right_thigh_connector_joint)
-
-    right_thigh_shin_joint = make_joint(right_thigh, right_shin, geometry.right_shin_link_pos1)
-    system.Add(right_thigh_shin_joint)
 
     right_thigh_4bar_joint = make_joint(right_thigh, right_4bar, geometry.right_4bar_link_pos1)
     system.Add(right_thigh_4bar_joint)
@@ -134,8 +132,17 @@ def make_model(system):
     right_4bar_ankle_joint2 = make_joint(right_4bar, right_ankle2, geometry.right_4bar_link_pos2)
     system.Add(right_4bar_ankle_joint2)
 
-    right_recip_joint = make_joint(main_body, right_recip, geometry.right_recip_link_pos1)
+    right_recip_joint = make_joint(right_recip, main_body, geometry.right_recip_link_pos1,
+                                   joint_type=chrono.ChLinkMotorRotationTorque)
+    recip_func = chrono.ChFunction_Sequence()
+    recip_func.Set_start(3)
+    recip_func.InsertFunct(chrono.ChFunction_Const(-10), 100)
+    recip_func.Setup()
+    right_recip_joint.SetTorqueFunction(recip_func)
     system.Add(right_recip_joint)
+
+    right_thigh_shin_joint = make_joint(right_thigh, right_shin, geometry.right_shin_link_pos1)
+    system.Add(right_thigh_shin_joint)
 
     '''
         Now do it again, but for the left side!
@@ -180,9 +187,6 @@ def make_model(system):
     left_thigh_connector_joint = make_joint(left_connector, left_thigh, geometry.left_connector_link_pos2)
     system.Add(left_thigh_connector_joint)
 
-    left_thigh_shin_joint = make_joint(left_thigh, left_shin, geometry.left_shin_link_pos1)
-    system.Add(left_thigh_shin_joint)
-
     left_thigh_4bar_joint = make_joint(left_thigh, left_4bar, geometry.left_4bar_link_pos1)
     system.Add(left_thigh_4bar_joint)
 
@@ -198,8 +202,25 @@ def make_model(system):
     left_4bar_ankle_joint2 = make_joint(left_4bar, left_ankle2, geometry.left_4bar_link_pos2)
     system.Add(left_4bar_ankle_joint2)
 
-    left_recip_joint = make_joint(main_body, left_recip, geometry.left_recip_link_pos1)
+    left_recip_joint = make_joint(main_body, left_recip, geometry.left_recip_link_pos1,
+                                  joint_type=chrono.ChLinkMotorRotationTorque)
+    left_recip_joint.SetTorqueFunction(chrono.ChFunction_Const(10))
     system.Add(left_recip_joint)
+
+    left_thigh_shin_joint = make_joint(left_thigh, left_shin, geometry.left_shin_link_pos1)
+    system.Add(left_thigh_shin_joint)
+
+    left_shin_pulley = chrono.ChLinkPulley()
+    left_shin_pulley.Initialize(left_connector, left_shin,
+                                chrono.ChCoordsysD(chrono.ChVectorD(0, 0, 0)))
+    system.Add(left_shin_pulley)
+
+    right_shin_pulley = chrono.ChLinkPulley()
+    right_shin_pulley.Initialize(right_connector, right_shin,
+                                chrono.ChCoordsysD(chrono.ChVectorD(0, 0, 0)))
+    system.Add(right_shin_pulley)
+
+
 
 
 if __name__ == '__main__':

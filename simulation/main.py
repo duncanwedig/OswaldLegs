@@ -28,12 +28,12 @@ def main():
     # If you need a finer control on which item really needs a visualization proxy in
     # Irrlicht, just use application.AssetBind(myitem); on a per-item basis.
 
-    myapplication.AssetBindAll();
+    myapplication.AssetBindAll()
 
     # ==IMPORTANT!== Use this function for 'converting' into Irrlicht meshes the assets
     # that you added to the bodies into 3D shapes, they can be visualized by Irrlicht!
 
-    myapplication.AssetUpdateAll();
+    myapplication.AssetUpdateAll()
 
     # ---------------------------------------------------------------------
     #
@@ -41,7 +41,7 @@ def main():
     #
 
     myapplication.SetTimestep(0.005)
-    myapplication.SetTryRealtime(True)
+    # myapplication.SetTryRealtime(True)
 
     while myapplication.GetDevice().run():
         myapplication.BeginScene()
